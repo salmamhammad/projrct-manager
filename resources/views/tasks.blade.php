@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+                <div class="card-header">задачи в проекте: {{$project->title}}</div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -13,7 +13,13 @@
                             {{ session('status') }}
                         </div>
                     @endif
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_project"> Добавить проект</a>
+                      <a
+                            href="{{ url('/home') }}"
+                            class="btn btn-primary"
+                        >
+                            проекты
+                        </a>
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_task"> Добавить Задачa</a>
 
                     <table class="table  datatable">
                         <thead>
@@ -28,16 +34,16 @@
                                    </tr>
                                  </thead>
                                   <tbody>
-                                    @foreach ($projects as $project)
+                                    @foreach ($tasks as $task)
                                     <tr>
-                                           <td>{{$project->id}}</td>
-                                           <td><a href="{{route('tasks',['id'=>$project->id])}}">{{$project->title}}</a></td>
-                                           <td>{{$project->description}}</td>
-                                           <td>{{$project->status}}</td>
-                                           <td>{{$project->created_at}}</td>
+                                           <td>{{$task->id}}</td>
+                                           <td>{{$task->title}}</td>
+                                           <td>{{$task->description}}</td>
+                                           <td>{{$task->status}}</td>
+                                           <td>{{$task->created_at}}</td>
                                            <td>
-                                                <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#edit_project{{$project->id}}"> редактировать </a>
-                                                <a href="{{route('project.delete',['id'=>$project->id])}}" class="btn btn-danger">удалить </a>
+                                                <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#edit_task{{$task->id}}"> редактировать </a>
+                                                <a href="{{route('task.delete',['id'=>$task->id])}}" class="btn btn-danger">удалить </a>
                                            </td>
 
                                            </tr>
@@ -52,36 +58,38 @@
         </div>
     </div>
 </div>
-@foreach ($projects as $project)
-<div class="modal fade" id="edit_project{{$project->id}}" tabindex="-1" aria-labelledby="edit_projectLabel" aria-hidden="true">
+@foreach ($tasks as $task)
+<div class="modal fade" id="edit_task{{$task->id}}" tabindex="-1" aria-labelledby="edit_taskLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title" id="edit_projectLabel">редактировать проект</h5>
+        <h5 class="modal-title" id="edit_taskLabel">редактировать Задачa</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form  action="{{route('project.edit')}}"  method="POST">
+      <form  action="{{route('task.edit')}}"  method="POST">
                 @csrf
       <div class="modal-body">
+       <input  type="hidden" name="project_id"  value="{{$project->id}}" />
 
-       <input  type="hidden" name="id"  value="{{$project->id}}" />
+       <input  type="hidden" name="id"  value="{{$task->id}}" />
        <div class="input-block mb-3">
          <label class="col-form-label">Заглавие </label>
-         <input class="form-control " type="text" name="title" required  value="{{$project->title}}" />
+        <input class="form-control @error('title') is-invalid @enderror " type="text" name="title" required value="{{ $task->title }}" />
+
 
         </div>
         <div class="input-block mb-3">
          <label class="col-form-label">Описание </label>
-         <textarea class="form-control" type="text" name="description" required  >{{$project->description}}</textarea>
+         <textarea class="form-control @error('description') is-invalid @enderror" type="text" name="description" required >{{$task->description}}</textarea>
 
         </div>
          <div class="input-block mb-3">
          <label class="col-form-label">Статус </label>
        <select class="form-control" name="status" required>
-        <option value="new" @selected($project->status == "new")>новый</option>
-        <option value="in_progress" @selected($project->status == "in_progress")>в процессе</option>
-       <option value="completed" @selected($project->status == "completed")>завершено</option>
+        <option value="new" @selected($task->status == "new")>новый</option>
+        <option value="in_progress" @selected($task->status == "in_progress")>в процессе</option>
+       <option value="completed" @selected($task->status == "completed")>завершено</option>
      </select>
 
 
@@ -99,26 +107,29 @@
 </div>
 
    @endforeach
-<div class="modal fade" id="add_project" tabindex="-1" aria-labelledby="add_projectLabel" aria-hidden="true">
+<div class="modal fade" id="add_task" tabindex="-1" aria-labelledby="add_taskLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title" id="add_projectLabel">Добавить проект</h5>
+        <h5 class="modal-title" id="add_taskLabel">Добавить Задачa</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form  action="{{route('project.add')}}"  method="POST">
+      <form  action="{{route('task.add')}}"  method="POST">
                 @csrf
       <div class="modal-body">
+       <input  type="hidden" name="project_id"  value="{{$project->id}}" />
 
        <div class="input-block mb-3">
          <label class="col-form-label">Заглавие </label>
-         <input class="form-control @error('title') is-invalid @enderror " type="text" name="title" required value="{{ old('title') }}" />
+        <input class="form-control @error('title') is-invalid @enderror " type="text" name="title" required value="{{ old('title') }}" />
+
 
         </div>
         <div class="input-block mb-3">
          <label class="col-form-label">Описание </label>
          <textarea class="form-control @error('description') is-invalid @enderror" type="text" name="description" required value="{{ old('title') }}"  ></textarea>
+
 
         </div>
          <div class="input-block mb-3">

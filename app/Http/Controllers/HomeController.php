@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\User;
+use Auth;
 class HomeController extends Controller
 {
     /**
@@ -23,7 +25,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $projects=Project::all();
+       $user = Auth::user();
+       $projects = $user->projects()->get();
         return view('home')->with('projects',$projects);
     }
 }
